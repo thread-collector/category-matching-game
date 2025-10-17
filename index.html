@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base target="_top">
+    <title>카테고리 매칭 게임</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 90%;
+        }
+
+        .email-form {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .email-form h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        .email-form input {
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            width: 300px;
+            margin-right: 10px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .email-form input:focus {
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .game-area {
+            display: none;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .game-header h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .user-info {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .game-content {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .categories, .descriptions {
+            flex: 1;
+        }
+
+        .categories h3, .descriptions h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 20px;
+        }
+
+        .category-item {
+            background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+            border: 2px solid #2196f3;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            user-select: none;
+        }
+
+        .category-item:hover {
+            background: linear-gradient(135deg, #bbdefb, #e1bee7);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(33,150,243,0.3);
+        }
+
+        .description-item {
+            background: linear-gradient(135deg, #fff3e0, #fce4ec);
+            border: 2px solid #ff9800;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: move;
+            transition: all 0.3s;
+            user-select: none;
+        }
+
+        .description-item:hover {
+            background: linear-gradient(135deg, #ffe0b2, #f8bbd9);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(255,152,0,0.3);
+        }
+
+        .category-item.drag-over {
+            border-color: #667eea;
+            background: #e7f3ff;
+        }
+
+        .description-item.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+
+        .matched {
+            background: #d4edda !important;
+            border-color: #28a745 !important;
+        }
+
+        .result-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .save-btn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            margin-top: 20px;
+        }
+
+        .results-display {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .results-display h4 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .match-result {
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .game-content {
+                flex-direction: column;
+            }
+            
+            .email-form input {
+                width: 250px;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="email-form" id="emailForm">
+            <h1>카테고리 매칭 게임</h1>
+            <p style="margin-bottom: 20px; color: #666;">게임을 시작하기 전에 이메일 주소를 입력해주세요.</p>
+            <input type="email" id="emailInput" placeholder="이메일 주소를 입력하세요" required>
+            <button class="btn" onclick="startGame()">게임 시작</button>
+        </div>
+
+        <div class="game-area" id="gameArea">
+            <div class="game-header">
+                <h2>카테고리와 기능을 매칭해보세요!</h2>
+                <div class="user-info" id="userInfo"></div>
+                <p style="color: #666; margin-top: 10px;">왼쪽 기능 설명을 드래그해서 오른쪽 적절한 카테고리에 놓아주세요.</p>
+                <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 12px; margin-top: 15px; font-size: 14px;">
+                    <strong>📝 구글 스프레드시트 설정 방법:</strong><br>
+                    1. <a href="https://script.google.com" target="_blank" style="color: #0066cc;">구글 Apps Script</a>에서 새 프로젝트 생성<br>
+                    2. README의 Apps Script 코드를 붙여넣기<br>
+                    3. '배포' → '웹 앱' → '모든 사용자' 선택<br>
+                    4. 발급된 URL을 이 파일의 SCRIPT_URL 상수에 입력
+                </div>
+            </div>
+
+            <div class="game-content">
+                <div class="descriptions">
+                    <h3>기능 설명</h3>
+                    <div class="description-item" draggable="true" data-description="A" ondragstart="drag(event)">
+                        <strong>고객과 상담할 기능이 필요해</strong>
+                    </div>
+                    <div class="description-item" draggable="true" data-description="B" ondragstart="drag(event)">
+                        <strong>구매평을 더 잘 보여주고 싶어. 아임웹 리뷰 기능으로는 부족해</strong>
+                    </div>
+                    <div class="description-item" draggable="true" data-description="C" ondragstart="drag(event)">
+                        <strong>온사이트 팝업 띄울거야</strong>
+                    </div>
+                    <div class="description-item" draggable="true" data-description="D" ondragstart="drag(event)">
+                        <strong>타겟해서 카카오톡 메세지 보내기</strong>
+                    </div>
+                    <div class="description-item" draggable="true" data-description="E" ondragstart="drag(event)">
+                        <strong>메타 광고 연동해야해</strong>
+                    </div>
+                    <div class="description-item" draggable="true" data-description="F" ondragstart="drag(event)">
+                        <strong>다양한 판매 채널 관리하기</strong>
+                    </div>
+                    <div class="description-item" draggable="true" data-description="G" ondragstart="drag(event)">
+                        <strong>AI 나도 쓰고 싶다</strong>
+                    </div>
+                    <div class="description-item" draggable="true" data-description="H" ondragstart="drag(event)">
+                        <strong>영상 올려야 하는데</strong>
+                    </div>
+                    <div class="description-item" draggable="true" data-description="I" ondragstart="drag(event)">
+                        <strong>택배 혼자 관리 힘들다</strong>
+                    </div>
+                </div>
+
+                <div class="categories">
+                    <h3>카테고리</h3>
+                    <div class="category-item" data-category="A" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        <strong>온사이트 마케팅</strong>
+                        <div class="matched-items" id="categoryA-items"></div>
+                    </div>
+                    <div class="category-item" data-category="B" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        <strong>리뷰</strong>
+                        <div class="matched-items" id="categoryB-items"></div>
+                    </div>
+                    <div class="category-item" data-category="C" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        <strong>고객상담</strong>
+                        <div class="matched-items" id="categoryC-items"></div>
+                    </div>
+                    <div class="category-item" data-category="D" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        <strong>CRM</strong>
+                        <div class="matched-items" id="categoryD-items"></div>
+                    </div>
+                    <div class="category-item" data-category="E" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        <strong>광고</strong>
+                        <div class="matched-items" id="categoryE-items"></div>
+                    </div>
+                    <div class="category-item" data-category="F" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        <strong>판매채널 및 주문관리</strong>
+                        <div class="matched-items" id="categoryF-items"></div>
+                    </div>
+                    <div class="category-item" data-category="G" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        <strong>AI</strong>
+                        <div class="matched-items" id="categoryG-items"></div>
+                    </div>
+                    <div class="category-item" data-category="H" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        <strong>숏폼 및 미디어 커머스</strong>
+                        <div class="matched-items" id="categoryH-items"></div>
+                    </div>
+                    <div class="category-item" data-category="I" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        <strong>배송 및 물류</strong>
+                        <div class="matched-items" id="categoryI-items"></div>
+                </div>
+            </div>
+
+            <div class="result-section">
+                <button class="btn save-btn" id="save-button">결과 저장</button>
+                <div class="results-display" id="resultsDisplay" style="display: none;">
+                    <h4>매칭 결과:</h4>
+                    <div id="matchResults"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwazelzgjxdHsw3cGlFRTGaW7RypVEl6N-B-m_BaFtNlMdWblaGHCBD9g5g8Rl2TCw/exec';
+
+        const categoryLabels = {
+            A: '온사이트 마케팅',
+            B: '리뷰',
+            C: '고객상담',
+            D: 'CRM',
+            E: '광고',
+            F: '판매채널 및 주문관리',
+            G: 'AI',
+            H: '숏폼 및 미디어 커머스',
+            I: '배송 및 물류'
+        };
+
+        const descriptionLabels = {
+            A: '고객과 상담할 기능이 필요해',
+            B: '구매평을 더 잘 보여주고 싶어. 아임웹 리뷰 기능으로는 부족해',
+            C: '온사이트 팝업 띄울거야',
+            D: '타겟해서 카카오톡 메세지 보내기',
+            E: '메타 광고 연동해야해',
+            F: '다양한 판매 채널 관리하기', 
+            G: 'AI 나도 쓰고 싶다',
+            H: '숏폼 영상 올려야 하는데',
+            I: '택배 혼자 관리 힘들다'
+        };
+
+        let userEmail = '';
+        let gameResults = {};
+
+        // 단순 피셔-예이츠 셔플 구현
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // 컨테이너 내부의 특정 셀렉터에 해당하는 자식 요소들을 랜덤 재배치
+        function shuffleChildren(container, itemSelector) {
+            if (!container) return;
+            const items = Array.from(container.querySelectorAll(itemSelector));
+            shuffleArray(items).forEach(el => container.appendChild(el));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const saveButton = document.getElementById('save-button');
+            if (saveButton) {
+                saveButton.addEventListener('click', handleSaveButtonClick);
+            }
+
+            // 페이지 열릴 때마다 설명과 카테고리 순서를 랜덤하게 섞기
+            const descriptionsContainer = document.querySelector('.descriptions');
+            const categoriesContainer = document.querySelector('.categories');
+            shuffleChildren(descriptionsContainer, '.description-item');
+            shuffleChildren(categoriesContainer, '.category-item');
+        });
+
+        function startGame() {
+            const email = document.getElementById('emailInput').value;
+            if (!email || !validateEmail(email)) {
+                alert('유효한 이메일 주소를 입력해주세요.');
+                return;
+            }
+            
+            userEmail = email;
+            gameResults = {};
+            document.getElementById('emailForm').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'block';
+            document.getElementById('userInfo').textContent = `플레이어: ${email}`;
+        }
+
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.add('drag-over');
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.getAttribute('data-description'));
+            ev.target.classList.add('dragging');
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.remove('drag-over');
+            
+            const descriptionId = ev.dataTransfer.getData("text");
+            const categoryId = ev.currentTarget.getAttribute('data-category');
+            const descriptionElement = document.querySelector(`[data-description="${descriptionId}"]`);
+            
+            if (descriptionElement) {
+                descriptionElement.classList.remove('dragging');
+                descriptionElement.classList.add('matched');
+                
+                const itemsContainer = document.getElementById(`category${categoryId}-items`);
+                const matchedItem = document.createElement('div');
+                matchedItem.style.marginTop = '10px';
+                matchedItem.style.padding = '8px';
+                matchedItem.style.background = '#e7f3ff';
+                matchedItem.style.borderRadius = '5px';
+                matchedItem.style.fontSize = '14px';
+                matchedItem.innerHTML = descriptionElement.innerHTML;
+                
+                itemsContainer.appendChild(matchedItem);
+                descriptionElement.style.display = 'none';
+                
+                gameResults[descriptionId] = categoryId;
+            }
+        }
+
+        document.addEventListener('dragend', function(e) {
+            document.querySelectorAll('.category-item').forEach(item => {
+                item.classList.remove('drag-over');
+            });
+            document.querySelectorAll('.description-item').forEach(item => {
+                item.classList.remove('dragging');
+            });
+        });
+
+        function handleSaveButtonClick() {
+            if (!userEmail) {
+                alert('먼저 이메일을 입력하고 게임을 시작해주세요.');
+                return;
+            }
+
+            if (Object.keys(gameResults).length === 0) {
+                alert('아직 매칭된 항목이 없습니다. 먼저 카테고리와 설명을 매칭해주세요.');
+                return;
+            }
+
+            const matchResultSummary = collectMatchResultSummary();
+            if (!matchResultSummary) {
+                alert('저장할 매칭 결과를 찾을 수 없습니다.');
+                return;
+            }
+
+            const now = new Date();
+            const timestampIso = now.toISOString();
+            const timestampDisplay = now.toLocaleString('ko-KR');
+
+            saveToSheetToAppsScript({
+                email: userEmail,
+                matchResult: matchResultSummary,
+                matches: { ...gameResults },
+                timestamp: timestampIso,
+                onSuccess: () => {
+                    alert('매칭 결과가 구글 스프레드시트에 저장되었습니다.');
+                    renderMatchResults(timestampDisplay);
+                },
+                onError: (error) => {
+                    console.error('스프레드시트 저장 실패:', error);
+                    alert(`스프레드시트 저장에 실패했습니다.\n${error.message || error}`);
+                }
+            });
+        }
+
+        function collectMatchResultSummary() {
+            if (Object.keys(gameResults).length === 0) {
+                return '';
+            }
+
+            return Object.entries(gameResults)
+                .map(([descriptionKey, categoryKey]) => {
+                    const descriptionLabel = descriptionLabels[descriptionKey] || descriptionKey;
+                    const categoryLabel = categoryLabels[categoryKey] || categoryKey;
+                    return `${descriptionLabel} → ${categoryLabel}`;
+                })
+                .join(', ');
+        }
+
+        async function saveToSheetToAppsScript({ email, matchResult, matches, timestamp, onSuccess, onError }) {
+            if (!SCRIPT_URL || SCRIPT_URL.includes('REPLACE_WITH_YOUR_WEB_APP_ID')) {
+                const error = new Error('Apps Script 웹앱 URL이 설정되지 않았습니다.');
+                if (typeof onError === 'function') {
+                    onError(error);
+                }
+                return;
+            }
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({
+                        email,
+                        timestamp,
+                        matchResult,
+                        matches
+                    })
+                });
+
+                if (typeof onSuccess === 'function') {
+                    onSuccess();
+                }
+            } catch (error) {
+                if (typeof onError === 'function') {
+                    onError(error);
+                }
+            }
+        }
+
+        function renderMatchResults(timestampDisplay) {
+            const matchResultsDiv = document.getElementById('matchResults');
+            matchResultsDiv.innerHTML = '';
+
+            Object.entries(gameResults).forEach(([descriptionKey, categoryKey]) => {
+                const descriptionLabel = descriptionLabels[descriptionKey] || descriptionKey;
+                const categoryLabel = categoryLabels[categoryKey] || categoryKey;
+
+                const matchDiv = document.createElement('div');
+                matchDiv.className = 'match-result';
+                matchDiv.innerHTML = `<strong>${descriptionLabel}</strong> → <strong>${categoryLabel}</strong>`;
+                matchResultsDiv.appendChild(matchDiv);
+            });
+
+            const summaryDiv = document.createElement('div');
+            summaryDiv.style.marginTop = '15px';
+            summaryDiv.style.padding = '10px';
+            summaryDiv.style.background = '#d4edda';
+            summaryDiv.style.borderRadius = '5px';
+            summaryDiv.innerHTML = `<strong>저장 완료!</strong><br>플레이어: ${userEmail}<br>저장 시간: ${timestampDisplay}`;
+            matchResultsDiv.appendChild(summaryDiv);
+
+            document.getElementById('resultsDisplay').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
