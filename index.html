@@ -5,7 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <base target="_top">
     <title>카테고리 매칭 게임</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard/dist/web/static/pretendard.css">
     <style>
+        :root {
+            --bg: #F2F4F6; /* Toss gray-100 */
+            --text: #333D4B; /* gray-800 */
+            --muted: #6B7684; /* gray-600 */
+
+            --primary: #3182F6; /* blue-500 */
+            --primary-hover: #1B64DA; /* blue-600 */
+            --primary-shadow: rgba(49,130,246,0.3);
+
+            --success: #00C473;
+            --success-hover: #05A660;
+            --danger: #FF5B56;
+            --danger-hover: #E3493D;
+
+            --desc-bg: #FFFFFF;
+            --desc-border: #E5E8EB; /* gray-200 */
+            --desc-hover-bg: #F9FAFB; /* gray-50 */
+
+            --category-bg: #E8F3FF; /* blue-50 */
+            --category-border: #3182F6; /* primary */
+            --category-hover-bg: #DDEBFF;
+
+            --drag-over-bg: #E8F3FF;
+            --matched-bg: rgba(0, 196, 115, 0.12);
+
+            /* Radius & Spacing */
+            --radius-container: 16px;
+            --radius-card: 12px;
+            --radius-button: 12px;
+
+            --space-1: 8px;
+            --space-2: 12px;
+            --space-3: 16px;
+            --space-4: 20px;
+            --space-5: 24px;
+            --space-6: 32px;
+
+            /* Controls */
+            --control-height: 44px;
+        }
         * {
             margin: 0;
             padding: 0;
@@ -13,8 +55,8 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "맑은 고딕", sans-serif;
+            background: var(--bg);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -23,8 +65,8 @@
 
         .container {
             background: white;
-            border-radius: 15px;
-            padding: 30px;
+            border-radius: var(--radius-container);
+            padding: var(--space-6);
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             max-width: 800px;
             width: 90%;
@@ -36,39 +78,60 @@
         }
 
         .email-form h1 {
-            color: #333;
-            margin-bottom: 20px;
+            color: var(--text);
+            margin-bottom: var(--space-3);
             font-size: 28px;
         }
 
         .email-form input {
-            padding: 12px 20px;
-            border: 2px solid #ddd;
-            border-radius: 25px;
+            padding: 12px 16px;
+            border: 1px solid var(--desc-border);
+            border-radius: var(--radius-button);
             font-size: 16px;
             width: 300px;
-            margin-right: 10px;
+            margin-right: var(--space-2);
             outline: none;
             transition: border-color 0.3s;
+            height: var(--control-height);
         }
 
         .email-form input:focus {
-            border-color: #667eea;
+            border-color: var(--primary);
         }
 
         .btn {
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: var(--primary);
             color: white;
             border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
+            padding: 10px 16px;
+            border-radius: var(--radius-button);
             cursor: pointer;
             font-size: 16px;
             transition: transform 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            vertical-align: middle;
+        }
+
+        /* Match game-start button height with email input */
+        .email-form .btn {
+            height: var(--control-height);
+            padding: 0 var(--space-3);
         }
 
         .btn:hover {
+            background: var(--primary-hover);
             transform: translateY(-2px);
+        }
+
+        /* 버튼 호버 컬러 */
+        .save-btn:hover {
+            background: var(--success-hover);
+        }
+        .reset-btn:hover {
+            background: var(--danger-hover);
         }
 
         .game-area {
@@ -77,24 +140,24 @@
 
         .game-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: var(--space-5);
         }
 
         .game-header h2 {
-            color: #333;
+            color: var(--text);
             margin-bottom: 10px;
         }
 
         .user-info {
-            color: #666;
+            color: var(--muted);
             font-size: 14px;
         }
 
         .game-content {
             display: flex;
             justify-content: space-between;
-            gap: 30px;
-            margin-bottom: 30px;
+            gap: var(--space-5);
+            margin-bottom: var(--space-5);
         }
 
         .categories, .descriptions {
@@ -103,48 +166,86 @@
 
         .categories h3, .descriptions h3 {
             text-align: center;
-            margin-bottom: 20px;
-            color: #333;
+            margin-bottom: var(--space-3);
+            color: var(--text);
+            font-size: 20px;
+        }
+
+        /* 공용 헤더(좌: 기능설명, 우: 카테고리) */
+        .lists-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+            gap: var(--space-5);
+            margin-bottom: var(--space-2);
+        }
+        .lists-header > div {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+        .lists-controls {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-top: var(--space-2);
+            margin-bottom: var(--space-2);
+        }
+        .title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .lists-header h3 {
+            margin: 0;
+            color: var(--text);
             font-size: 20px;
         }
 
         .category-item {
-            background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
-            border: 2px solid #2196f3;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
+            background: var(--category-bg);
+            border: 1px solid var(--category-border);
+            border-radius: var(--radius-card);
+            padding: var(--space-3);
+            margin-bottom: var(--space-3);
             cursor: pointer;
             transition: all 0.3s;
             user-select: none;
         }
 
         .category-item:hover {
-            background: linear-gradient(135deg, #bbdefb, #e1bee7);
+            background: var(--category-hover-bg);
             transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(33,150,243,0.3);
+            box-shadow: 0 8px 16px var(--primary-shadow);
         }
 
         .description-item {
-            background: linear-gradient(135deg, #fff3e0, #fce4ec);
-            border: 2px solid #ff9800;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
+            background: var(--desc-bg);
+            border: 1px solid var(--desc-border);
+            border-radius: var(--radius-card);
+            padding: var(--space-3);
+            margin-bottom: var(--space-3);
             cursor: move;
             transition: all 0.3s;
             user-select: none;
         }
 
         .description-item:hover {
-            background: linear-gradient(135deg, #ffe0b2, #f8bbd9);
+            background: var(--desc-hover-bg);
             transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(255,152,0,0.3);
+            box-shadow: 0 8px 16px var(--primary-shadow);
         }
 
         .category-item.drag-over {
-            border-color: #667eea;
-            background: #e7f3ff;
+            border-color: var(--primary);
+            background: var(--drag-over-bg);
+        }
+
+        .descriptions.drag-over {
+            outline: 1px dashed var(--primary);
+            outline-offset: 6px;
+            background: var(--drag-over-bg);
         }
 
         .description-item.dragging {
@@ -153,40 +254,84 @@
         }
 
         .matched {
-            background: #d4edda !important;
-            border-color: #28a745 !important;
+            background: #FFFFFF !important; /* 가독성을 위해 흰색 유지 */
+            border-color: var(--success) !important; /* 매칭 강조는 테두리 색으로 */
+        }
+
+        /* 카테고리에 들어간 아이템은 조금 컴팩트하게 표시 */
+        .description-item.in-category {
+            margin-top: var(--space-2);
+            font-size: 14px;
+            cursor: move;
         }
 
         .result-section {
             text-align: center;
-            margin-top: 30px;
+            margin-top: var(--space-5);
             width: 100%;
         }
 
         .save-btn {
-            background: linear-gradient(45deg, #28a745, #20c997);
-            margin-top: 20px;
+            background: var(--success);
+            margin-top: var(--space-3);
+        }
+
+        .reset-btn {
+            background: var(--danger);
+            display: inline-flex;
+            margin-bottom: var(--space-2);
         }
 
         .results-display {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
+            background: #FFFFFF;
+            border: 1px solid var(--desc-border);
+            border-radius: var(--radius-card);
+            padding: var(--space-3);
+            margin-top: var(--space-3);
             text-align: left;
         }
 
         .results-display h4 {
             margin-bottom: 15px;
-            color: #333;
+            color: var(--text);
         }
 
         .match-result {
             padding: 8px 12px;
-            margin: 5px 0;
-            background: white;
-            border-radius: 5px;
-            border-left: 4px solid #667eea;
+            margin: 6px 0;
+            background: #FFFFFF;
+            border-radius: var(--radius-card);
+            border: 1px solid var(--desc-border);
+            border-left: 4px solid var(--primary);
+        }
+
+        /* 카테고리 요약 */
+        .category-summary {
+            background: #FFFFFF;
+            border: 1px solid var(--desc-border);
+            border-radius: var(--radius-card);
+            padding: var(--space-3);
+            margin: var(--space-3) 0;
+        }
+        .category-summary h4 {
+            margin: 0 0 var(--space-2) 0;
+            font-size: 14px;
+            color: var(--muted);
+        }
+        .category-summary .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-1);
+        }
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            background: var(--category-bg);
+            border: 1px solid var(--category-border);
+            border-radius: 9999px;
+            font-size: 12px;
+            color: var(--text);
         }
 
         @media (max-width: 768px) {
@@ -215,7 +360,7 @@
                 <h2>카테고리와 기능을 매칭해보세요!</h2>
                 <div class="user-info" id="userInfo"></div>
                 <p style="color: #666; margin-top: 10px;">왼쪽 기능 설명을 드래그해서 오른쪽 적절한 카테고리에 놓아주세요.</p>
-                <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 12px; margin-top: 15px; font-size: 14px;">
+                <div style="background: #F2F4F6; border: 1px solid #E5E8EB; border-radius: 8px; padding: 12px; margin-top: 15px; font-size: 14px; color: #333D4B;">
                     <strong>📝 게임방법:</strong><br>
                     1. 왼쪽 기능 설명을 보고 거기에 해당할 것 같은 카테고리에 드래그하세요.<br>
                     2. 1개의 카테고리에 여러개의 기능설명을 넣을 수 있어요.<br>
@@ -224,9 +369,30 @@
                 </div>
             </div>
 
+            <div class="category-summary">
+                <h4>카테고리 요약</h4>
+                <div class="chips" id="categorySummary"></div>
+            </div>
+
+            <div class="lists-controls">
+                <button class="btn reset-btn" id="reset-button" type="button">초기화</button>
+            </div>
+
+            <div class="lists-header">
+                <div class="descriptions-header">
+                    <div class="title-row">
+                        <h3>기능 설명</h3>
+                    </div>
+                </div>
+                <div class="categories-header">
+                    <div class="title-row">
+                        <h3>카테고리</h3>
+                    </div>
+                </div>
+            </div>
+
             <div class="game-content">
-                <div class="descriptions">
-                    <h3>기능 설명</h3>
+                <div class="descriptions" ondrop="dropToLeft(event)" ondragover="allowDrop(event)">
                     <div class="description-item" draggable="true" data-description="A" ondragstart="drag(event)">
                         <strong>고객과 상담할 기능이 필요해</strong>
                     </div>
@@ -275,7 +441,6 @@
                 </div>
 
                 <div class="categories">
-                    <h3>카테고리</h3>
                     <div class="category-item" data-category="A" ondrop="drop(event)" ondragover="allowDrop(event)">
                         <strong>CRM/팝업/모달</strong>
                         <div class="matched-items" id="categoryA-items"></div>
@@ -326,12 +491,13 @@
                     </div>
                     <div class="category-item" data-category="N" ondrop="drop(event)" ondragover="allowDrop(event)">
                         <strong>인증/보안/사이트 관리</strong>
+                        <div class="matched-items" id="categoryN-items"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="result-section">
+        <div class="result-section" id="resultSection" style="display: none;">
                 <button class="btn save-btn" id="save-button">결과 저장</button>
                 <div class="results-display" id="resultsDisplay" style="display: none;">
                     <h4>매칭 결과:</h4>
@@ -397,10 +563,17 @@
             shuffleArray(items).forEach(el => container.appendChild(el));
         }
 
+        let initialOrderIndex = {};
+
         document.addEventListener('DOMContentLoaded', () => {
             const saveButton = document.getElementById('save-button');
             if (saveButton) {
                 saveButton.addEventListener('click', handleSaveButtonClick);
+            }
+
+            const resetButton = document.getElementById('reset-button');
+            if (resetButton) {
+                resetButton.addEventListener('click', handleResetButtonClick);
             }
 
             // 페이지 열릴 때마다 설명과 카테고리 순서를 랜덤하게 섞기
@@ -408,7 +581,43 @@
             const categoriesContainer = document.querySelector('.categories');
             shuffleChildren(descriptionsContainer, '.description-item');
             shuffleChildren(categoriesContainer, '.category-item');
+
+            // 섞인 이후 사용자에게 보이는 초기 순서를 기록
+            const items = document.querySelectorAll('.descriptions .description-item');
+            items.forEach((el, idx) => {
+                const id = el.getAttribute('data-description');
+                if (id) initialOrderIndex[id] = idx;
+            });
+
+            // 카테고리 요약 칩 생성
+            renderCategorySummary();
         });
+
+        function renderCategorySummary() {
+            const wrap = document.getElementById('categorySummary');
+            if (!wrap) return;
+            wrap.innerHTML = '';
+            const order = ['A','B','C','D','E','F','G','H','I','J','K','L','N'];
+            order.forEach(key => {
+                const label = (categoryLabels && categoryLabels[key]) ? categoryLabels[key] : key;
+                const chip = document.createElement('span');
+                chip.className = 'chip';
+                chip.textContent = label;
+                wrap.appendChild(chip);
+            });
+        }
+
+        function sortLeftByInitialOrder() {
+            const container = document.querySelector('.descriptions');
+            if (!container) return;
+            const items = Array.from(container.querySelectorAll('.description-item'));
+            items.sort((a, b) => {
+                const ai = initialOrderIndex[a.getAttribute('data-description')] ?? 0;
+                const bi = initialOrderIndex[b.getAttribute('data-description')] ?? 0;
+                return ai - bi;
+            });
+            items.forEach(el => container.appendChild(el));
+        }
 
         function startGame() {
             const email = document.getElementById('emailInput').value;
@@ -422,6 +631,8 @@
             document.getElementById('emailForm').style.display = 'none';
             document.getElementById('gameArea').style.display = 'block';
             document.getElementById('userInfo').textContent = `플레이어: ${email}`;
+            const resultSection = document.getElementById('resultSection');
+            if (resultSection) resultSection.style.display = 'block';
         }
 
         function validateEmail(email) {
@@ -450,27 +661,75 @@
             if (descriptionElement) {
                 descriptionElement.classList.remove('dragging');
                 descriptionElement.classList.add('matched');
-                
+                descriptionElement.classList.add('in-category');
+
                 const itemsContainer = document.getElementById(`category${categoryId}-items`);
-                const matchedItem = document.createElement('div');
-                matchedItem.style.marginTop = '10px';
-                matchedItem.style.padding = '8px';
-                matchedItem.style.background = '#e7f3ff';
-                matchedItem.style.borderRadius = '5px';
-                matchedItem.style.fontSize = '14px';
-                matchedItem.innerHTML = descriptionElement.innerHTML;
-                
-                itemsContainer.appendChild(matchedItem);
-                descriptionElement.style.display = 'none';
-                
+                if (!itemsContainer) return;
+
+                // 카테고리로 실제 요소를 이동
+                itemsContainer.appendChild(descriptionElement);
+
+                // 매칭 결과 갱신
                 gameResults[descriptionId] = categoryId;
             }
+        }
+
+        // 왼쪽 영역으로 드롭하면 원래 리스트로 복귀
+        function dropToLeft(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.remove('drag-over');
+
+            const descriptionId = ev.dataTransfer.getData("text");
+            const descriptionElement = document.querySelector(`[data-description="${descriptionId}"]`);
+            const descriptionsContainer = document.querySelector('.descriptions');
+
+            if (descriptionElement && descriptionsContainer) {
+                descriptionElement.classList.remove('dragging');
+                descriptionElement.classList.remove('matched');
+                descriptionElement.classList.remove('in-category');
+                descriptionsContainer.appendChild(descriptionElement);
+                // 매칭 해제
+                delete gameResults[descriptionId];
+                // 초기 순서대로 정렬
+                sortLeftByInitialOrder();
+            }
+        }
+
+        function handleResetButtonClick() {
+            const descriptionsContainer = document.querySelector('.descriptions');
+            const allDesc = Array.from(document.querySelectorAll('.description-item'));
+
+            allDesc.forEach(el => {
+                el.classList.remove('dragging');
+                el.classList.remove('matched');
+                el.classList.remove('in-category');
+                descriptionsContainer.appendChild(el);
+            });
+
+            // 초기 순서대로 정렬
+            sortLeftByInitialOrder();
+
+            // 결과 초기화
+            gameResults = {};
+
+            // 결과 영역 숨김
+            const resultsDisplay = document.getElementById('resultsDisplay');
+            const matchResults = document.getElementById('matchResults');
+            if (matchResults) matchResults.innerHTML = '';
+            if (resultsDisplay) resultsDisplay.style.display = 'none';
+
+            // 시각적 상태 초기화
+            document.querySelectorAll('.category-item').forEach(item => item.classList.remove('drag-over'));
+            const desc = document.querySelector('.descriptions');
+            if (desc) desc.classList.remove('drag-over');
         }
 
         document.addEventListener('dragend', function(e) {
             document.querySelectorAll('.category-item').forEach(item => {
                 item.classList.remove('drag-over');
             });
+            const desc = document.querySelector('.descriptions');
+            if (desc) desc.classList.remove('drag-over');
             document.querySelectorAll('.description-item').forEach(item => {
                 item.classList.remove('dragging');
             });
@@ -575,7 +834,8 @@
             const summaryDiv = document.createElement('div');
             summaryDiv.style.marginTop = '15px';
             summaryDiv.style.padding = '10px';
-            summaryDiv.style.background = '#d4edda';
+            summaryDiv.style.background = 'var(--matched-bg)';
+            summaryDiv.style.border = '1px solid var(--success)';
             summaryDiv.style.borderRadius = '5px';
             summaryDiv.innerHTML = `<strong>저장 완료!</strong><br>플레이어: ${userEmail}<br>저장 시간: ${timestampDisplay}`;
             matchResultsDiv.appendChild(summaryDiv);
