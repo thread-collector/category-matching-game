@@ -220,7 +220,7 @@
                     1. 왼쪽 기능 설명을 보고 거기에 해당할 것 같은 카테고리에 드래그하세요.<br>
                     2. 1개의 카테고리에 여러개의 기능설명을 넣을 수 있어요.<br>
                     <strong>3. 정답은 없어요!!!!</strong><br>
-                    4. 발급된 URL을 이 파일의 SCRIPT_URL 상수에 입력
+                    4. 매칭을 완료 했으면 꼭 맨 끝에 '결과 저장' 버튼을 눌러 제출해주세요.
                 </div>
             </div>
 
@@ -234,32 +234,50 @@
                         <strong>구매평을 더 잘 보여주고 싶어. 아임웹 리뷰 기능으로는 부족해</strong>
                     </div>
                     <div class="description-item" draggable="true" data-description="C" ondragstart="drag(event)">
-                        <strong>온사이트 팝업 띄울거야</strong>
+                        <strong>사이트에 조건 걸어서 팝업 띄워야하는데 아임웹은 안돼네</strong>
                     </div>
                     <div class="description-item" draggable="true" data-description="D" ondragstart="drag(event)">
-                        <strong>타겟해서 카카오톡 메세지 보내기</strong>
+                        <strong>특정 고객을 타겟해서 카카오톡 메세지 보내고 싶어</strong>
                     </div>
                     <div class="description-item" draggable="true" data-description="E" ondragstart="drag(event)">
                         <strong>메타 광고 연동해야해</strong>
                     </div>
                     <div class="description-item" draggable="true" data-description="F" ondragstart="drag(event)">
-                        <strong>다양한 판매 채널 관리하기</strong>
+                        <strong>지그재그에서 상품 올리고 주문 받아야해</strong>
                     </div>
                     <div class="description-item" draggable="true" data-description="G" ondragstart="drag(event)">
-                        <strong>AI 나도 쓰고 싶다</strong>
+                        <strong>인스타그램 콘텐츠 연동이 필요해</strong>
                     </div>
                     <div class="description-item" draggable="true" data-description="H" ondragstart="drag(event)">
-                        <strong>영상 올려야 하는데</strong>
+                        <strong>우리가 만든영상 올려야하는데 어떻게 올리지</strong>
                     </div>
                     <div class="description-item" draggable="true" data-description="I" ondragstart="drag(event)">
                         <strong>택배 혼자 관리 힘들다</strong>
+                    </div>
+                    <div class="description-item" draggable="true" data-description="J" ondragstart="drag(event)">
+                        <strong>반찬 정기구독 결제를 받아야해</strong>
+                    </div>
+                    <div class="description-item" draggable="true" data-description="K" ondragstart="drag(event)">
+                        <strong>상품 상세 페이지 만드는 게 너무 어려워. 솔루션 없나</strong>
+                    </div>
+                    <div class="description-item" draggable="true" data-description="L" ondragstart="drag(event)">
+                        <strong>네이버 쇼핑 카탈로그? EP? 연동해야하는데</strong>
+                    </div>
+                    <div class="description-item" draggable="true" data-description="M" ondragstart="drag(event)">
+                        <strong>내 사이트로 어떻게 들어오는지 알고 전환율 같은 게 궁금해</strong>
+                    </div>
+                    <div class="description-item" draggable="true" data-description="N" ondragstart="drag(event)">
+                        <strong>사이트 특성상 성인인증이 꼭 필요한데 어떻게 하지</strong>
+                    </div>
+                    <div class="description-item" draggable="true" data-description="O" ondragstart="drag(event)">
+                        <strong>우리 사이트에 네이버페이 붙일 거야</strong>
                     </div>
                 </div>
 
                 <div class="categories">
                     <h3>카테고리</h3>
                     <div class="category-item" data-category="A" ondrop="drop(event)" ondragover="allowDrop(event)">
-                        <strong>온사이트 마케팅</strong>
+                        <strong>CRM/팝업/모달</strong>
                         <div class="matched-items" id="categoryA-items"></div>
                     </div>
                     <div class="category-item" data-category="B" ondrop="drop(event)" ondragover="allowDrop(event)">
@@ -267,32 +285,48 @@
                         <div class="matched-items" id="categoryB-items"></div>
                     </div>
                     <div class="category-item" data-category="C" ondrop="drop(event)" ondragover="allowDrop(event)">
-                        <strong>고객상담</strong>
+                        <strong>고객상담 및 CS관리</strong>
                         <div class="matched-items" id="categoryC-items"></div>
                     </div>
                     <div class="category-item" data-category="D" ondrop="drop(event)" ondragover="allowDrop(event)">
-                        <strong>CRM</strong>
+                        <strong>회원가입 최적화</strong>
                         <div class="matched-items" id="categoryD-items"></div>
                     </div>
                     <div class="category-item" data-category="E" ondrop="drop(event)" ondragover="allowDrop(event)">
-                        <strong>광고</strong>
+                        <strong>광고 관리</strong>
                         <div class="matched-items" id="categoryE-items"></div>
                     </div>
                     <div class="category-item" data-category="F" ondrop="drop(event)" ondragover="allowDrop(event)">
-                        <strong>판매채널 및 주문관리</strong>
+                        <strong>주문관리/판매채널</strong>
                         <div class="matched-items" id="categoryF-items"></div>
                     </div>
                     <div class="category-item" data-category="G" ondrop="drop(event)" ondragover="allowDrop(event)">
-                        <strong>AI</strong>
+                        <strong>SNS/소셜미디어</strong>
                         <div class="matched-items" id="categoryG-items"></div>
                     </div>
                     <div class="category-item" data-category="H" ondrop="drop(event)" ondragover="allowDrop(event)">
-                        <strong>숏폼 및 미디어 커머스</strong>
+                        <strong>영상/라이브커머스/숏폼</strong>
                         <div class="matched-items" id="categoryH-items"></div>
                     </div>
                     <div class="category-item" data-category="I" ondrop="drop(event)" ondragover="allowDrop(event)">
-                        <strong>배송 및 물류</strong>
+                        <strong>배송/물류/풀필먼트</strong>
                         <div class="matched-items" id="categoryI-items"></div>
+                    </div>
+                    <div class="category-item" data-category="J" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        <strong>결제</strong>
+                        <div class="matched-items" id="categoryJ-items"></div>
+                    </div>
+                    <div class="category-item" data-category="K" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        <strong>콘텐츠 제작/관리</strong>
+                        <div class="matched-items" id="categoryK-items"></div>
+                    </div>
+                    <div class="category-item" data-category="L" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        <strong>통계 및 매출 분석</strong>
+                        <div class="matched-items" id="categoryL-items"></div>
+                    </div>
+                    <div class="category-item" data-category="N" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        <strong>인증/보안/사이트 관리</strong>
+                    </div>
                 </div>
             </div>
         </div>
@@ -311,15 +345,19 @@
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwazelzgjxdHsw3cGlFRTGaW7RypVEl6N-B-m_BaFtNlMdWblaGHCBD9g5g8Rl2TCw/exec';
 
         const categoryLabels = {
-            A: '온사이트 마케팅',
+            A: 'CRM/팝업/모달',
             B: '리뷰',
-            C: '고객상담',
-            D: 'CRM',
-            E: '광고',
+            C: '고객상담 및 CS관리',
+            D: '회원가입 최적화',
+            E: '광고 관리',
             F: '판매채널 및 주문관리',
-            G: 'AI',
-            H: '숏폼 및 미디어 커머스',
-            I: '배송 및 물류'
+            G: 'SNS/소셜미디어',
+            H: '영상/라이브커머스/숏폼',
+            I: '배송 및 물류',
+            J: '결제',
+            K: '콘텐츠 제작/관리',
+            L: '통계 및 매출 분석',
+            N: '인증/보안/사이트 관리'
         };
 
         const descriptionLabels = {
@@ -331,7 +369,13 @@
             F: '다양한 판매 채널 관리하기', 
             G: 'AI 나도 쓰고 싶다',
             H: '숏폼 영상 올려야 하는데',
-            I: '택배 혼자 관리 힘들다'
+            I: '택배 혼자 관리 힘들다',
+            J: '반찬 정기구독 결제를 받아야해',
+            K: '상품 상세 페이지 만드는 게 너무 어려워. 솔루션 없나',
+            L: '네이버 쇼핑 카탈로그? EP? 연동해야하는데',
+            M: '내 사이트로 어떻게 들어오는지 알고 전환율 같은 게 궁금해',
+            N: '사이트 특성상 성인인증이 꼭 필요한데 어떻게 하지',
+            O: '우리 사이트에 네이버페이 붙일 거야'
         };
 
         let userEmail = '';
