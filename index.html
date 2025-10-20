@@ -99,6 +99,28 @@
             border-color: var(--primary);
         }
 
+        .nickname-note {
+            margin-top: var(--space-2);
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .email-actions {
+            display: flex;
+            gap: var(--space-2);
+            justify-content: center;
+            align-items: center;
+            margin-top: var(--space-2);
+        }
+        .secondary-btn {
+            background: #FFFFFF;
+            color: var(--text);
+            border: 1px solid var(--desc-border);
+        }
+        .secondary-btn:hover {
+            background: var(--desc-hover-bg);
+        }
+
         .btn {
             background: var(--primary);
             color: white;
@@ -113,6 +135,10 @@
             justify-content: center;
             line-height: 1;
             vertical-align: middle;
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         /* Match game-start button height with email input */
@@ -299,10 +325,40 @@
         .match-result {
             padding: 8px 12px;
             margin: 6px 0;
-            background: #FFFFFF;
+            background: var(--desc-hover-bg);
             border-radius: var(--radius-card);
             border: 1px solid var(--desc-border);
-            border-left: 4px solid var(--primary);
+            border-left: 4px solid var(--desc-border);
+        }
+
+        /* 저장 후 비활성화 상태 */
+        .disable-interaction {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        /* 저장 진행 표시 바 */
+        .progress-bar {
+            position: relative;
+            height: 4px;
+            background: var(--desc-border);
+            border-radius: 9999px;
+            overflow: hidden;
+            margin-top: var(--space-2);
+        }
+        .progress-bar .bar {
+            position: absolute;
+            left: -40%;
+            width: 40%;
+            height: 100%;
+            background: var(--primary);
+            border-radius: inherit;
+            animation: indeterminate 1.2s ease-in-out infinite;
+        }
+        @keyframes indeterminate {
+            0% { left: -40%; width: 40%; }
+            50% { left: 20%; width: 60%; }
+            100% { left: 100%; width: 40%; }
         }
 
         /* 카테고리 요약 */
@@ -322,6 +378,12 @@
             display: flex;
             flex-wrap: wrap;
             gap: var(--space-1);
+        }
+        .category-summary .summary-desc {
+            margin-top: var(--space-2);
+            margin-bottom: var(--space-3);
+            color: var(--muted);
+            font-size: 13px;
         }
         .chip {
             display: inline-flex;
@@ -350,9 +412,12 @@
     <div class="container">
         <div class="email-form" id="emailForm">
             <h1>카테고리 매칭 게임</h1>
-            <p style="margin-bottom: 20px; color: #666;">게임을 시작하기 전에 이메일 주소를 입력해주세요.</p>
-            <input type="email" id="emailInput" placeholder="이메일 주소를 입력하세요" required>
-            <button class="btn" onclick="startGame()">게임 시작</button>
+            <p style="margin-bottom: 20px; color: #666;">아래 별명으로 바로 시작합니다.</p>
+            <div id="nicknameDisplay" class="nickname-note" style="font-size:16px; color: var(--text);"></div>
+            <div class="email-actions">
+                <button class="btn secondary-btn" type="button" onclick="regenerateNickname()">별명 바꾸기</button>
+                <button class="btn" type="button" onclick="startGame()">게임 시작</button>
+            </div>
         </div>
 
         <div class="game-area" id="gameArea">
@@ -360,17 +425,19 @@
                 <h2>카테고리와 기능을 매칭해보세요!</h2>
                 <div class="user-info" id="userInfo"></div>
                 <p style="color: #666; margin-top: 10px;">왼쪽 기능 설명을 드래그해서 오른쪽 적절한 카테고리에 놓아주세요.</p>
-                <div style="background: #F2F4F6; border: 1px solid #E5E8EB; border-radius: 8px; padding: 12px; margin-top: 15px; font-size: 14px; color: #333D4B;">
+                <div style="background: #F2F4F6; border: 1px solid #E5E8EB; border-radius: 8px; padding: 12px; margin-top: 15px; font-size: 14px; color: #333D4B; text-align: left; line-height: 1.5;">
                     <strong>📝 게임방법:</strong><br>
                     1. 왼쪽 기능 설명을 보고 거기에 해당할 것 같은 카테고리에 드래그하세요.<br>
                     2. 1개의 카테고리에 여러개의 기능설명을 넣을 수 있어요.<br>
                     <strong>3. 정답은 없어요!!!!</strong><br>
-                    4. 매칭을 완료 했으면 꼭 맨 끝에 '결과 저장' 버튼을 눌러 제출해주세요.
+                    4. 매칭을 완료 했으면 꼭 맨 끝에 '결과 저장' 버튼을 눌러 제출해주세요.<br>
+                    5. 기능 설명이 없는 카테고리는 없어요. 1개 카테고리에 여러 기능이 매칭될 수도 있어요.
                 </div>
             </div>
 
             <div class="category-summary">
                 <h4>카테고리 요약</h4>
+                <p class="summary-desc">카테고리는 이런 카테고리가 있어요. 미리 확인하고 고민해 보세요~!</p>
                 <div class="chips" id="categorySummary"></div>
             </div>
 
@@ -499,6 +566,8 @@
 
         <div class="result-section" id="resultSection" style="display: none;">
                 <button class="btn save-btn" id="save-button">결과 저장</button>
+                <div id="saveProgress" class="progress-bar" style="display: none;"><div class="bar"></div></div>
+                <button class="btn secondary-btn" id="back-button" type="button" style="display: none;">돌아가기</button>
                 <div class="results-display" id="resultsDisplay" style="display: none;">
                     <h4>매칭 결과:</h4>
                     <div id="matchResults"></div>
@@ -533,8 +602,8 @@
             D: '타겟해서 카카오톡 메세지 보내기',
             E: '메타 광고 연동해야해',
             F: '다양한 판매 채널 관리하기', 
-            G: 'AI 나도 쓰고 싶다',
-            H: '숏폼 영상 올려야 하는데',
+            G: '인스타그램 콘텐츠 연동이 필요해',
+            H: '우리가 만든영상 올려야하는데 어떻게 올리지',
             I: '택배 혼자 관리 힘들다',
             J: '반찬 정기구독 결제를 받아야해',
             K: '상품 상세 페이지 만드는 게 너무 어려워. 솔루션 없나',
@@ -545,6 +614,7 @@
         };
 
         let userEmail = '';
+        let userNickname = '';
         let gameResults = {};
 
         // 단순 피셔-예이츠 셔플 구현
@@ -575,6 +645,10 @@
             if (resetButton) {
                 resetButton.addEventListener('click', handleResetButtonClick);
             }
+            const backButton = document.getElementById('back-button');
+            if (backButton) {
+                backButton.addEventListener('click', handleBackButtonClick);
+            }
 
             // 페이지 열릴 때마다 설명과 카테고리 순서를 랜덤하게 섞기
             const descriptionsContainer = document.querySelector('.descriptions');
@@ -591,7 +665,46 @@
 
             // 카테고리 요약 칩 생성
             renderCategorySummary();
+
+            // 별명 생성/표시
+            userNickname = getOrCreateNickname();
+            const nickEl = document.getElementById('nicknameDisplay');
+            if (nickEl) {
+                nickEl.textContent = `이번 접속 별명: ${userNickname}`;
+            }
         });
+
+        function getOrCreateNickname() {
+            try {
+                const key = 'categoryGameNickname';
+                let nick = localStorage.getItem(key);
+                if (!nick) {
+                    nick = generateNickname();
+                    localStorage.setItem(key, nick);
+                }
+                return nick;
+            } catch (e) {
+                return generateNickname();
+            }
+        }
+
+        function regenerateNickname() {
+            const key = 'categoryGameNickname';
+            const nick = generateNickname();
+            try { localStorage.setItem(key, nick); } catch (e) {}
+            userNickname = nick;
+            const nickEl = document.getElementById('nicknameDisplay');
+            if (nickEl) nickEl.textContent = `이번 접속 별명: ${userNickname}`;
+        }
+
+        function generateNickname() {
+            const adjectives = ['푸른','반짝이는','빠른','용감한','귀여운','신비한','멋진','활기찬','영리한','다정한','예쁜','수줍은','깜찍한','간지나는'];
+            const animals = ['고래','여우','호랑이','판다','독수리','사자','돌고래','나비','펭귄','늑대','기린','공작','오소리','너구리'];
+            const adj = adjectives[Math.floor(Math.random()*adjectives.length)];
+            const ani = animals[Math.floor(Math.random()*animals.length)];
+            const num = Math.floor(100 + Math.random()*900);
+            return `${adj}-${ani}-${num}`;
+        }
 
         function renderCategorySummary() {
             const wrap = document.getElementById('categorySummary');
@@ -620,17 +733,28 @@
         }
 
         function startGame() {
-            const email = document.getElementById('emailInput').value;
-            if (!email || !validateEmail(email)) {
-                alert('유효한 이메일 주소를 입력해주세요.');
-                return;
+            // 이메일 입력 UI가 없으면 별명 기반 익명 이메일을 생성
+            const emailInput = document.getElementById('emailInput');
+            let email = '';
+            if (emailInput) {
+                email = emailInput.value;
+                if (!email || !validateEmail(email)) {
+                    alert('유효한 이메일 주소를 입력해주세요.');
+                    return;
+                }
+            } else {
+                // 닉네임(+숫자)만 사용해 이메일 필드 채움(도메인 제거)
+                const nick = userNickname || getOrCreateNickname();
+                email = `${nick}`;
             }
-            
+
             userEmail = email;
+            // 별명은 (가능하면) 로컬스토리지 값을 사용
+            userNickname = getOrCreateNickname();
             gameResults = {};
             document.getElementById('emailForm').style.display = 'none';
             document.getElementById('gameArea').style.display = 'block';
-            document.getElementById('userInfo').textContent = `플레이어: ${email}`;
+            document.getElementById('userInfo').textContent = `플레이어: ${email} (${userNickname})`;
             const resultSection = document.getElementById('resultSection');
             if (resultSection) resultSection.style.display = 'block';
         }
@@ -756,20 +880,98 @@
             const timestampIso = now.toISOString();
             const timestampDisplay = now.toLocaleString('ko-KR');
 
+            setSavingUI(true);
+
             saveToSheetToAppsScript({
                 email: userEmail,
+                nickname: userNickname,
                 matchResult: matchResultSummary,
                 matches: { ...gameResults },
                 timestamp: timestampIso,
                 onSuccess: () => {
+                    setSavingUI(false);
                     alert('매칭 결과가 구글 스프레드시트에 저장되었습니다.');
                     renderMatchResults(timestampDisplay);
+                    lockGameUI();
                 },
                 onError: (error) => {
                     console.error('스프레드시트 저장 실패:', error);
+                    setSavingUI(false);
                     alert(`스프레드시트 저장에 실패했습니다.\n${error.message || error}`);
                 }
             });
+        }
+
+        function setSavingUI(saving) {
+            const btn = document.getElementById('save-button');
+            const bar = document.getElementById('saveProgress');
+            if (!btn || !bar) return;
+            if (saving) {
+                btn.disabled = true;
+                if (!btn.dataset.label) btn.dataset.label = btn.textContent;
+                btn.textContent = '저장 중...';
+                bar.style.display = 'block';
+            } else {
+                btn.disabled = false;
+                if (btn.dataset.label) btn.textContent = btn.dataset.label;
+                bar.style.display = 'none';
+            }
+        }
+
+        function lockGameUI() {
+            const desc = document.querySelector('.descriptions');
+            const cats = document.querySelector('.categories');
+            if (desc) desc.classList.add('disable-interaction');
+            if (cats) cats.classList.add('disable-interaction');
+            document.querySelectorAll('.description-item').forEach(el => el.setAttribute('draggable', 'false'));
+            const resetBtn = document.getElementById('reset-button');
+            if (resetBtn) resetBtn.disabled = true;
+            const saveBtn = document.getElementById('save-button');
+            if (saveBtn) saveBtn.disabled = true;
+            const backBtn = document.getElementById('back-button');
+            if (backBtn) backBtn.style.display = 'inline-flex';
+        }
+
+        function unlockGameUI() {
+            const desc = document.querySelector('.descriptions');
+            const cats = document.querySelector('.categories');
+            if (desc) desc.classList.remove('disable-interaction');
+            if (cats) cats.classList.remove('disable-interaction');
+            document.querySelectorAll('.description-item').forEach(el => el.setAttribute('draggable', 'true'));
+            const resetBtn = document.getElementById('reset-button');
+            if (resetBtn) resetBtn.disabled = false;
+            const saveBtn = document.getElementById('save-button');
+            if (saveBtn) saveBtn.disabled = false;
+            const backBtn = document.getElementById('back-button');
+            if (backBtn) backBtn.style.display = 'none';
+        }
+
+        function handleBackButtonClick() {
+            // 화면 전환: 첫 화면으로
+            const emailForm = document.getElementById('emailForm');
+            const gameArea = document.getElementById('gameArea');
+            const resultSection = document.getElementById('resultSection');
+            if (emailForm) emailForm.style.display = 'block';
+            if (gameArea) gameArea.style.display = 'none';
+            if (resultSection) resultSection.style.display = 'none';
+
+            // 상태 초기화
+            const resultsDisplay = document.getElementById('resultsDisplay');
+            const matchResults = document.getElementById('matchResults');
+            if (matchResults) matchResults.innerHTML = '';
+            if (resultsDisplay) resultsDisplay.style.display = 'none';
+
+            // 항목 복귀 및 정렬
+            const descriptionsContainer = document.querySelector('.descriptions');
+            const allDesc = Array.from(document.querySelectorAll('.description-item'));
+            allDesc.forEach(el => {
+                el.classList.remove('dragging', 'matched', 'in-category');
+                if (descriptionsContainer) descriptionsContainer.appendChild(el);
+            });
+            sortLeftByInitialOrder();
+
+            gameResults = {};
+            unlockGameUI();
         }
 
         function collectMatchResultSummary() {
@@ -837,7 +1039,7 @@
             summaryDiv.style.background = 'var(--matched-bg)';
             summaryDiv.style.border = '1px solid var(--success)';
             summaryDiv.style.borderRadius = '5px';
-            summaryDiv.innerHTML = `<strong>저장 완료!</strong><br>플레이어: ${userEmail}<br>저장 시간: ${timestampDisplay}`;
+            summaryDiv.innerHTML = `<strong>저장 완료!</strong><br>플레이어: ${userEmail} (${userNickname})<br>저장 시간: ${timestampDisplay}`;
             matchResultsDiv.appendChild(summaryDiv);
 
             document.getElementById('resultsDisplay').style.display = 'block';
