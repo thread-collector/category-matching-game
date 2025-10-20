@@ -32,6 +32,7 @@
 
             --drag-over-bg: #E8F3FF;
             --matched-bg: rgba(0, 196, 115, 0.12);
+            --accent: #F59E0B; /* nickname accent (amber-500) */
 
             /* Radius & Spacing */
             --radius-container: 16px;
@@ -105,12 +106,26 @@
             color: var(--muted);
         }
 
+        .nickname-row {
+            display: inline-flex;
+            gap: var(--space-2);
+            align-items: center;
+            justify-content: center;
+            margin-top: var(--space-2);
+        }
+
+        .nickname-highlight {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
         .email-actions {
             display: flex;
             gap: var(--space-2);
             justify-content: center;
             align-items: center;
-            margin-top: var(--space-2);
+            margin-top: var(--space-5);
         }
         .secondary-btn {
             background: #FFFFFF;
@@ -119,6 +134,37 @@
         }
         .secondary-btn:hover {
             background: var(--desc-hover-bg);
+        }
+
+        .nickname-change-btn {
+            color: var(--accent);
+            background: transparent;
+            border-color: var(--accent);
+            height: 32px;
+            font-size: 14px;
+            padding: 4px 10px;
+        }
+        /* 강제 오버라이드: 어떤 경우에도 채워지지 않도록 */
+        .btn.nickname-change-btn {
+            background: transparent !important;
+            border: 1px solid var(--accent) !important;
+            color: var(--accent) !important;
+        }
+        .nickname-change-btn:hover {
+            background: transparent;
+        }
+        .nickname-change-btn .icon {
+            font-size: 14px;
+            margin-right: 6px;
+            line-height: 1;
+            display: inline-block;
+        }
+        .nickname-change-btn .icon.spin {
+            animation: spin 0.6s ease-in-out;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .btn {
@@ -296,6 +342,26 @@
             margin-top: var(--space-5);
             width: 100%;
         }
+        .result-actions {
+            display: flex;
+            gap: var(--space-2);
+            justify-content: center;
+            align-items: center;
+            margin-bottom: var(--space-2);
+        }
+        /* 버튼 높이/패딩 통일로 시각 높이 일치 */
+        .result-actions .btn {
+            height: var(--control-height);
+            padding: 0 var(--space-3);
+            margin-top: 0;
+        }
+        .result-actions .save-btn { margin-top: 0; }
+        .result-actions .secondary-btn { margin-top: 0; }
+        #saveProgress {
+            max-width: 360px;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
         .save-btn {
             background: var(--success);
@@ -413,9 +479,11 @@
         <div class="email-form" id="emailForm">
             <h1>카테고리 매칭 게임</h1>
             <p style="margin-bottom: 20px; color: #666;">아래 별명으로 바로 시작합니다.</p>
-            <div id="nicknameDisplay" class="nickname-note" style="font-size:16px; color: var(--text);"></div>
+            <div class="nickname-row">
+                <span id="nicknameDisplay" class="nickname-highlight"></span>
+                <button class="btn secondary-btn nickname-change-btn" type="button" onclick="regenerateNickname()"><span class="icon" aria-hidden="true">🎲</span>별명 바꾸기</button>
+            </div>
             <div class="email-actions">
-                <button class="btn secondary-btn" type="button" onclick="regenerateNickname()">별명 바꾸기</button>
                 <button class="btn" type="button" onclick="startGame()">게임 시작</button>
             </div>
         </div>
@@ -565,9 +633,11 @@
         </div>
 
         <div class="result-section" id="resultSection" style="display: none;">
-                <button class="btn save-btn" id="save-button">결과 저장</button>
+                <div class="result-actions">
+                    <button class="btn save-btn" id="save-button">결과 저장</button>
+                    <button class="btn secondary-btn" id="back-button" type="button" style="display: none;">다시하기</button>
+                </div>
                 <div id="saveProgress" class="progress-bar" style="display: none;"><div class="bar"></div></div>
-                <button class="btn secondary-btn" id="back-button" type="button" style="display: none;">돌아가기</button>
                 <div class="results-display" id="resultsDisplay" style="display: none;">
                     <h4>매칭 결과:</h4>
                     <div id="matchResults"></div>
@@ -670,31 +740,28 @@
             userNickname = getOrCreateNickname();
             const nickEl = document.getElementById('nicknameDisplay');
             if (nickEl) {
-                nickEl.textContent = `이번 접속 별명: ${userNickname}`;
+                nickEl.textContent = `${userNickname}`;
             }
         });
 
         function getOrCreateNickname() {
-            try {
-                const key = 'categoryGameNickname';
-                let nick = localStorage.getItem(key);
-                if (!nick) {
-                    nick = generateNickname();
-                    localStorage.setItem(key, nick);
-                }
-                return nick;
-            } catch (e) {
-                return generateNickname();
-            }
+            // 저장하지 않고 매 로드마다 새 별명 생성
+            return generateNickname();
         }
 
         function regenerateNickname() {
-            const key = 'categoryGameNickname';
+            // 회전 애니메이션
+            const btn = document.querySelector('.nickname-change-btn');
+            const icon = btn ? btn.querySelector('.icon') : null;
+            if (icon) {
+                icon.classList.remove('spin');
+                void icon.offsetWidth; // reflow to restart animation
+                icon.classList.add('spin');
+            }
             const nick = generateNickname();
-            try { localStorage.setItem(key, nick); } catch (e) {}
             userNickname = nick;
             const nickEl = document.getElementById('nicknameDisplay');
-            if (nickEl) nickEl.textContent = `이번 접속 별명: ${userNickname}`;
+            if (nickEl) nickEl.textContent = `${userNickname}`;
         }
 
         function generateNickname() {
@@ -732,6 +799,26 @@
             items.forEach(el => container.appendChild(el));
         }
 
+        function reshuffleLists() {
+            const descriptionsContainer = document.querySelector('.descriptions');
+            const categoriesContainer = document.querySelector('.categories');
+            if (descriptionsContainer) {
+                shuffleChildren(descriptionsContainer, '.description-item');
+            }
+            if (categoriesContainer) {
+                shuffleChildren(categoriesContainer, '.category-item');
+            }
+            // 새 셔플 기준으로 초기 인덱스 갱신
+            initialOrderIndex = {};
+            if (descriptionsContainer) {
+                const items = descriptionsContainer.querySelectorAll('.description-item');
+                items.forEach((el, idx) => {
+                    const id = el.getAttribute('data-description');
+                    if (id) initialOrderIndex[id] = idx;
+                });
+            }
+        }
+
         function startGame() {
             // 이메일 입력 UI가 없으면 별명 기반 익명 이메일을 생성
             const emailInput = document.getElementById('emailInput');
@@ -754,7 +841,7 @@
             gameResults = {};
             document.getElementById('emailForm').style.display = 'none';
             document.getElementById('gameArea').style.display = 'block';
-            document.getElementById('userInfo').textContent = `플레이어: ${email} (${userNickname})`;
+            document.getElementById('userInfo').textContent = `플레이어: ${userEmail}`;
             const resultSection = document.getElementById('resultSection');
             if (resultSection) resultSection.style.display = 'block';
         }
@@ -884,7 +971,6 @@
 
             saveToSheetToAppsScript({
                 email: userEmail,
-                nickname: userNickname,
                 matchResult: matchResultSummary,
                 matches: { ...gameResults },
                 timestamp: timestampIso,
@@ -947,31 +1033,45 @@
         }
 
         function handleBackButtonClick() {
-            // 화면 전환: 첫 화면으로
+            // 화면 전환: 홈이 아닌, 게임 시작 상태로 복귀
             const emailForm = document.getElementById('emailForm');
             const gameArea = document.getElementById('gameArea');
             const resultSection = document.getElementById('resultSection');
-            if (emailForm) emailForm.style.display = 'block';
-            if (gameArea) gameArea.style.display = 'none';
-            if (resultSection) resultSection.style.display = 'none';
+            if (emailForm) emailForm.style.display = 'none';
+            if (gameArea) gameArea.style.display = 'block';
+            if (resultSection) resultSection.style.display = 'block';
 
-            // 상태 초기화
+            // 상태 초기화 (결과 패널은 숨기고, 결과 내용 비움)
             const resultsDisplay = document.getElementById('resultsDisplay');
             const matchResults = document.getElementById('matchResults');
             if (matchResults) matchResults.innerHTML = '';
             if (resultsDisplay) resultsDisplay.style.display = 'none';
 
-            // 항목 복귀 및 정렬
+            // 진행바/버튼 상태 초기화
+            setSavingUI(false);
+            const backBtn = document.getElementById('back-button');
+            if (backBtn) backBtn.style.display = 'none';
+
+            // 항목 복귀 및 셔플
             const descriptionsContainer = document.querySelector('.descriptions');
             const allDesc = Array.from(document.querySelectorAll('.description-item'));
             allDesc.forEach(el => {
                 el.classList.remove('dragging', 'matched', 'in-category');
                 if (descriptionsContainer) descriptionsContainer.appendChild(el);
             });
-            sortLeftByInitialOrder();
+            reshuffleLists();
 
+            // 게임 상태 초기화 및 UI 활성화
             gameResults = {};
             unlockGameUI();
+
+            // 상단 유저 정보 갱신(별명 유지)
+            const userInfo = document.getElementById('userInfo');
+            if (userInfo) {
+                const nick = userNickname || getOrCreateNickname();
+                userEmail = nick;
+                userInfo.textContent = `플레이어: ${userEmail}`;
+            }
         }
 
         function collectMatchResultSummary() {
@@ -1039,7 +1139,7 @@
             summaryDiv.style.background = 'var(--matched-bg)';
             summaryDiv.style.border = '1px solid var(--success)';
             summaryDiv.style.borderRadius = '5px';
-            summaryDiv.innerHTML = `<strong>저장 완료!</strong><br>플레이어: ${userEmail} (${userNickname})<br>저장 시간: ${timestampDisplay}`;
+            summaryDiv.innerHTML = `<strong>저장 완료!</strong><br>플레이어: ${userEmail}<br>저장 시간: ${timestampDisplay}`;
             matchResultsDiv.appendChild(summaryDiv);
 
             document.getElementById('resultsDisplay').style.display = 'block';
